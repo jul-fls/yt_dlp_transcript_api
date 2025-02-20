@@ -3,7 +3,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DELETE_TRANSCRIPT_FILES = process.env.DELETE_TRANSCRIPT_FILES || true;
+const DELETE_TRANSCRIPT_FILES = process.env.DELETE_TRANSCRIPT_FILES === 'true';
 
 const process_subs = require('./process_subs');
 
