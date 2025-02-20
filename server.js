@@ -71,6 +71,7 @@ app.get('/download_transcript', async (req, res) => {
         const cleaned_transcript = await process_subs(transcript_content);
 
         res.setHeader('Content-Type', 'text/plain');
+        sleep(3000);
         res.send(cleaned_transcript);
         fs.unlink(transcript_file, (err) => {
             if (err) {
