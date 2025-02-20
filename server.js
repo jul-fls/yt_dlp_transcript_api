@@ -13,7 +13,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const downloadTranscript = async (video_id, language) => {
     // use system yt-dlp command to download the transcript
     const video_url = `https://www.youtube.com/watch?v=${video_id}`;
-    const command = `yt-dlp --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o transcript.${video_id} ${video_url}`;
+    const command = `yt-dlp --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o /app/transcript.${video_id} ${video_url}`;
     console.log("Running command:", command);
 
     return new Promise((resolve, reject) => {
@@ -65,9 +65,9 @@ app.get('/download_transcript', async (req, res) => {
         await downloadTranscript($video_id, $language);
 
         // get filename matching this pattern : transcript.*.vtt
-        const transcript_file = fs.readdirSync('.').find(file =>
-            file.startsWith(`transcript.${$video_id}`) && file.endsWith('.vtt')
-        );
+        const transcript_file = fs.readdirSync('/app').find(file =>
+            file.includes(`${$video_id}`) && file.endsWith('.vtt')
+        );        
         const transcript_content = fs.readFileSync(transcript_file, 'utf8');
 
         // Process the transcript content
