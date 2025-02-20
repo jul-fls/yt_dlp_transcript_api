@@ -57,17 +57,10 @@ app.get('/download_transcript', async (req, res) => {
     }
 
     try {
-
-        // const $decoded_cookies = Buffer.from($cookies, 'base64').toString('utf-8');
-        // fs.writeFileSync('cookies.txt', $decoded_cookies);
-
-        // run a system command to download the transcript
         await downloadTranscript($video_id, $language);
 
-        // get filename matching this pattern : transcript.*.vtt
-        const transcript_file = fs.readdirSync('/app').find(file =>
-            file.includes(`${$video_id}`) && file.endsWith('.vtt')
-        );        
+        // get filename matching this pattern : transcript.videoid*.vtt
+        const transcript_file = `/app/transcript.${$video_id}.${$language}.vtt`;
         const transcript_content = fs.readFileSync(transcript_file, 'utf8');
 
         // Process the transcript content
