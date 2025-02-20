@@ -22,6 +22,7 @@ WORKDIR /app
 
 # Install only necessary Puppeteer dependencies
 RUN apk add --no-cache \
+    python3 \
     curl \
     ffmpeg \
     && rm -rf /var/cache/*

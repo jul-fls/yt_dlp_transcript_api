@@ -11,7 +11,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const downloadTranscript = async (video_url, language) => {
     // use system yt-dlp command to download the transcript
-    const command = `yt-dlp --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o transcript.%(ext)s ${video_url}`;
+    const command = `yt-dlp --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o transcript ${video_url}`;
     console.log("Running command:", command);
 
     return new Promise((resolve, reject) => {
