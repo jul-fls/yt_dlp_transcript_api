@@ -45,6 +45,7 @@ const downloadTranscript = async (video_url, language) => {
 
 // Transcript route
 app.get('/download_transcript', async (req, res) => {
+    sleep(5000); // sleep for 1 second to allow the server to process the request
     const $video_url = req.query.video_url;
     const $language = req.query.language || 'en';
     const $cookies = req.query.cookies;
@@ -71,7 +72,6 @@ app.get('/download_transcript', async (req, res) => {
         const cleaned_transcript = await process_subs(transcript_content);
 
         res.setHeader('Content-Type', 'text/plain');
-        sleep(3000);
         res.send(cleaned_transcript);
         fs.unlink(transcript_file, (err) => {
             if (err) {
