@@ -35,11 +35,6 @@ const downloadTranscript = async (video_id, language) => {
             }
 
             console.log(`Transcript downloaded: ${stdout}`);
-            // fs.unlink('cookies.txt', (err) => {
-            //     if (err) {
-            //         console.error("Error deleting cookies file:", err);
-            //     }
-            // });
             resolve(stdout);
         });
     });
@@ -47,10 +42,9 @@ const downloadTranscript = async (video_id, language) => {
 
 // Transcript route
 app.get('/download_transcript', async (req, res) => {
-    sleep(5000); // sleep for 1 second to allow the server to process the request
+    sleep(5000); // sleep for 5 second to allow the server to process the request
     const $video_id = req.query.video_id;
     const $language = req.query.language || 'en';
-    // const $cookies = req.query.cookies;
 
     if (!$video_id || $video_id === '' || !$language || $language === '') {
         return res.status(400).send('Video Id and language are required');
