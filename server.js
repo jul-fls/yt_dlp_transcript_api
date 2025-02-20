@@ -13,7 +13,7 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const downloadTranscript = async (video_id, language) => {
     // use system yt-dlp command to download the transcript
     const video_url = `https://www.youtube.com/watch?v=${video_id}`;
-    const command = `yt-dlp --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o /app/transcript.${video_id} ${video_url}`;
+    const command = `yt-dlp --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o transcript.${video_id} ${video_url}`;
     console.log("Running command:", command);
 
     return new Promise((resolve, reject) => {
@@ -44,8 +44,7 @@ const downloadTranscript = async (video_id, language) => {
 app.get('/download_transcript', async (req, res) => {
     sleep(5000); // sleep for 5 second to allow the server to process the request
     const $video_id = req.query.video_id;
-    const $language = req.query.language || 'en';
-
+    const $language = req.query.language || 'en-*'; // default to English
     if (!$video_id || $video_id === '' || !$language || $language === '') {
         return res.status(400).send('Video Id and language are required');
     }
@@ -53,17 +52,24 @@ app.get('/download_transcript', async (req, res) => {
     try {
         await downloadTranscript($video_id, $language);
 
-        // get filename matching this pattern : transcript.videoid*.vtt
-        const transcript_file = `/app/transcript.${$video_id}.${$language}.vtt`;
-        const transcript_content = fs.readFileSync(transcript_file, 'utf8');
+        const $languageParsed = $language.split('-')[0];
+        const $transcript_file = `transcript.${$video_id}.${$languageParsed}.vtt`;
+
+        // check if the file exists
+        if (!fs.existsSync($transcript_file)) {
+            console.error("Transcript file not found:", $transcript_file);
+            return res.status(404).send('Transcript file not found');
+        }
+
+        const $transcript_content = fs.readFileSync($transcript_file, 'utf8');
 
         // Process the transcript content
-        const cleaned_transcript = await process_subs(transcript_content);
+        const $cleaned_transcript = await process_subs($transcript_content);
 
         res.setHeader('Content-Type', 'text/plain');
-        res.send(cleaned_transcript);
+        res.send($cleaned_transcript);
         if(DELETE_TRANSCRIPT_FILES){
-            fs.unlink(transcript_file, (err) => {
+            fs.unlink($transcript_file, (err) => {
                 if (err) {
                     console.error("Error deleting transcript file:", err);
                 }
