@@ -22,6 +22,8 @@ WORKDIR /app
 
 # Install only necessary Puppeteer dependencies
 RUN apk add --no-cache \
+    curl \
+    ffmpeg \
     && rm -rf /var/cache/*
 
 # Install yt-dlp
