@@ -9,9 +9,10 @@ const process_subs = require('./process_subs');
 // Utility function to pause execution for a set amount of time
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const downloadTranscript = async (video_url, language) => {
+const downloadTranscript = async (video_id, language) => {
     // use system yt-dlp command to download the transcript
-    const command = `yt-dlp --cookies cookies.txt --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o transcript ${video_url}`;
+    const video_url = `https://www.youtube.com/watch?v=${video_id}`;
+    const command = `yt-dlp --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o transcript.${video_id} ${video_url}`;
     console.log("Running command:", command);
 
     return new Promise((resolve, reject) => {
@@ -46,25 +47,25 @@ const downloadTranscript = async (video_url, language) => {
 // Transcript route
 app.get('/download_transcript', async (req, res) => {
     sleep(5000); // sleep for 1 second to allow the server to process the request
-    const $video_url = req.query.video_url;
+    const $video_id = req.query.video_id;
     const $language = req.query.language || 'en';
-    const $cookies = req.query.cookies;
+    // const $cookies = req.query.cookies;
 
-    if (!$video_url || $video_url === '' || !$language || $language === '' || !$cookies || $cookies === '') {
-        return res.status(400).send('Video URL, language and cookies are required');
+    if (!$video_id || $video_id === '' || !$language || $language === '') {
+        return res.status(400).send('Video Id and language are required');
     }
 
     try {
 
-        const $decoded_cookies = Buffer.from($cookies, 'base64').toString('utf-8');
-        fs.writeFileSync('cookies.txt', $decoded_cookies);
+        // const $decoded_cookies = Buffer.from($cookies, 'base64').toString('utf-8');
+        // fs.writeFileSync('cookies.txt', $decoded_cookies);
 
         // run a system command to download the transcript
-        await downloadTranscript($video_url, $language);
+        await downloadTranscript($video_id, $language);
 
         // get filename matching this pattern : transcript.*.vtt
         const transcript_file = fs.readdirSync('.').find(file =>
-            file.startsWith('transcript') && file.endsWith('.vtt')
+            file.startsWith(`transcript.${$video_id}`) && file.endsWith('.vtt')
         );
         const transcript_content = fs.readFileSync(transcript_file, 'utf8');
 
@@ -80,7 +81,7 @@ app.get('/download_transcript', async (req, res) => {
         });
     } catch (error) {
         console.error("Error downloading transcript:", error);
-        res.status(500).send('Failed to download transcript');
+        res.status(500).send(`Failed to download transcript: ${error}`);
     }
 });
 
