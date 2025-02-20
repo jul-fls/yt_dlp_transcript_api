@@ -9,9 +9,7 @@ const process_subs = require('./process_subs');
 // Utility function to pause execution for a set amount of time
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const downloadTranscript = async (video_url, language, cookies) => {
-    // write cookies to a file
-    fs.writeFileSync('cookies.txt', cookies);
+const downloadTranscript = async (video_url, language) => {
     // use system yt-dlp command to download the transcript
     const command = `yt-dlp --cookies cookies.txt --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o transcript ${video_url}`;
     console.log("Running command:", command);
@@ -35,11 +33,11 @@ const downloadTranscript = async (video_url, language, cookies) => {
             }
 
             console.log(`Transcript downloaded: ${stdout}`);
-            fs.unlink('cookies.txt', (err) => {
-                if (err) {
-                    console.error("Error deleting cookies file:", err);
-                }
-            });
+            // fs.unlink('cookies.txt', (err) => {
+            //     if (err) {
+            //         console.error("Error deleting cookies file:", err);
+            //     }
+            // });
             resolve(stdout);
         });
     });
@@ -56,8 +54,12 @@ app.get('/download_transcript', async (req, res) => {
     }
 
     try {
+
+        const $decoded_cookies = Buffer.from($cookies, 'base64').toString('utf-8');
+        fs.writeFileSync('cookies.txt', $decoded_cookies);
+
         // run a system command to download the transcript
-        await downloadTranscript($video_url, $language, $cookies);
+        await downloadTranscript($video_url, $language);
 
         // get filename matching this pattern : transcript.*.vtt
         const transcript_file = fs.readdirSync('.').find(file =>
