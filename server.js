@@ -3,6 +3,7 @@ const { exec } = require('child_process');
 const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
+const DELETE_TRANSCRIPT_FILES = process.env.DELETE_TRANSCRIPT_FILES || true;
 
 const process_subs = require('./process_subs');
 
@@ -74,11 +75,13 @@ app.get('/download_transcript', async (req, res) => {
 
         res.setHeader('Content-Type', 'text/plain');
         res.send(cleaned_transcript);
-        fs.unlink(transcript_file, (err) => {
-            if (err) {
-                console.error("Error deleting transcript file:", err);
-            }
-        });
+        if(DELETE_TRANSCRIPT_FILES){
+            fs.unlink(transcript_file, (err) => {
+                if (err) {
+                    console.error("Error deleting transcript file:", err);
+                }
+            });
+        }
     } catch (error) {
         console.error("Error downloading transcript:", error);
         res.status(500).send(`Failed to download transcript: ${error}`);
