@@ -9,9 +9,11 @@ const process_subs = require('./process_subs');
 // Utility function to pause execution for a set amount of time
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const downloadTranscript = async (video_url, language) => {
+const downloadTranscript = async (video_url, language, cookies) => {
+    // write cookies to a file
+    fs.writeFileSync('cookies.txt', cookies);
     // use system yt-dlp command to download the transcript
-    const command = `yt-dlp --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o transcript ${video_url}`;
+    const command = `yt-dlp --cookies cookies.txt --write-subs --write-auto-subs --skip-download --sub-langs ${language} -o transcript ${video_url}`;
     console.log("Running command:", command);
 
     return new Promise((resolve, reject) => {
@@ -33,6 +35,11 @@ const downloadTranscript = async (video_url, language) => {
             }
 
             console.log(`Transcript downloaded: ${stdout}`);
+            fs.unlink('cookies.txt', (err) => {
+                if (err) {
+                    console.error("Error deleting cookies file:", err);
+                }
+            });
             resolve(stdout);
         });
     });
@@ -42,14 +49,15 @@ const downloadTranscript = async (video_url, language) => {
 app.get('/download_transcript', async (req, res) => {
     const $video_url = req.query.video_url;
     const $language = req.query.language || 'en';
+    const $cookies = req.query.cookies;
 
-    if (!$video_url || $video_url === '' || !$language || $language === '') {
-        return res.status(400).send('Video URL and language parameters are required');
+    if (!$video_url || $video_url === '' || !$language || $language === '' || !$cookies || $cookies === '') {
+        return res.status(400).send('Video URL, language and cookies are required');
     }
 
     try {
         // run a system command to download the transcript
-        await downloadTranscript($video_url, $language);
+        await downloadTranscript($video_url, $language, $cookies);
 
         // get filename matching this pattern : transcript.*.vtt
         const transcript_file = fs.readdirSync('.').find(file =>
