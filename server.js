@@ -42,7 +42,7 @@ const downloadTranscript = async (video_id, language) => {
 
 // Transcript route
 app.get('/download_transcript', async (req, res) => {
-    sleep(5000); // sleep for 5 second to allow the server to process the request
+    sleep(1000); // sleep for 5 second to allow the server to process the request
     const $video_id = req.query.video_id;
     const $language = req.query.language || 'en-*'; // default to English
     if (!$video_id || $video_id === '' || !$language || $language === '') {
