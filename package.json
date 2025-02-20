@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/jul-fls/yt_dlp_transcript_api/issues"
   },
-  "homepage": "https://github.com/jul-fls/yt_dlp_transcript_api#readme"
+  "homepage": "https://github.com/jul-fls/yt_dlp_transcript_api#readme",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
 }
