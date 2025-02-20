@@ -54,7 +54,6 @@ app.get('/download_transcript', async (req, res) => {
 // Start the Express server
 app.listen(PORT, async () => {
     try {
-        await initBrowser();
         console.log(`Server running on port ${PORT}`);
     } catch (error) {
         console.error("Failed to initialize server:", error);
