@@ -58,7 +58,7 @@ app.get('/download_transcript', async (req, res) => {
         // check if the file exists
         if (!fs.existsSync($transcript_file)) {
             console.error("Transcript file not found:", $transcript_file);
-            return res.send("");
+            return res.send("no transcript");
         }
 
         const $transcript_content = fs.readFileSync($transcript_file, 'utf8');
